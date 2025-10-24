@@ -76,9 +76,13 @@ namespace ProjectManagementAPI.Controllers
                     Console.WriteLine("Returned from Redis cache.");
                     return Ok(cachedUser);
                 }
+            else
+            {
+                Console.WriteLine("User fetched from MongoDB");
+            }
 
-            
-           
+
+
 
 
             var user = await _mongoService.Users
