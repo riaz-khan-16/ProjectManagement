@@ -1,0 +1,83 @@
+# 🚀 TeamSync – Real-Time Team Collaboration Board
+
+## 🧩 Project Overview
+**TeamSync** is a real-time collaboration board designed to help small teams manage projects, assign tasks, and communicate efficiently.  
+This system demonstrates a modular architecture integrating **.NET 8 Web API**, **MongoDB**, **Redis**, and **Angular 18**. It is structured to extend with **RabbitMQ** and **SignalR** for asynchronous communication and real-time updates.
+
+---
+
+## 🏗️ Architecture Overview
+
+| Component | Technology | Description |
+|-----------|------------|-------------|
+| **Backend API** | ASP.NET Core 8 | Handles authentication, projects, and tasks API. |
+| **Database** | MongoDB | Stores users, projects, tasks, and chat history. |
+| **Cache Layer** | Redis | Caches user profiles, project task lists, and recent chat messages. |
+| **Message Broker** | RabbitMQ | Publishes events like `TaskCreated`, `TaskUpdated`, `TaskDeleted`. |
+| **Real-Time Hub** | SignalR | Pushes updates and chat messages to connected clients. |
+| **Frontend** | Angular 18 | Responsive web client consuming APIs and listening on SignalR hub. |
+
+---
+
+## ✅ Features Implemented
+
+### 🧠 Backend (ASP.NET Core 8)
+- **User Management**
+  - JWT-based authentication
+  - User registration with duplicate email validation
+  - Password hashing
+  - Profile endpoint: `GET /api/users/{id}` with optional Redis caching
+
+- **Project Management**
+  - CRUD operations for projects
+  - Fields: `Name`, `Description`, `CreatedBy`, `Members`
+
+- **Task Management**
+  - Tasks belong to projects
+  - Fields: `Title`, `Description`, `Status`, `Assignee`, `DueDate`, `CreatedBy`, `CreatedAt`
+
+---
+
+### 💻 Frontend (Angular 18)
+- **Authentication**
+  - Login & registration linked with backend API
+  - JWT stored in `localStorage` for session management
+- **Dashboard**
+  - List all projects and their tasks
+  - Task creation, editing, and deletion UI
+  - Clean gray-themed interface for usability
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/<your-username>/TeamSync.git
+cd TeamSync
+
+2️⃣ Backend Setup
+cd Backend
+dotnet restore
+dotnet build
+dotnet run
+
+
+MongoDB Configuration:
+In appsettings.json, update the connection string:
+
+"ConnectionStrings": {
+  "DefaultConnection": "mongodb://localhost:27017/ProjectManagementDB"
+}
+
+The backend will run at:
+ https://localhost:7043
+
+3️ Frontend Setup
+cd Frontend
+npm install
+ng serve
+
+
+The frontend will run at:
+http://localhost:4200
