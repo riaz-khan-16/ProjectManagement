@@ -139,7 +139,7 @@ namespace ProjectManagementAPI.Controllers
 
             Console.WriteLine("Project updated and Redis cache cleared.");
 
-            return Ok(new { message = "Project updated successfully" });
+            return NoContent();
 
         }
 
@@ -158,8 +158,7 @@ namespace ProjectManagementAPI.Controllers
 
             Console.WriteLine("Project deleted and Redis cache cleared.");
 
-            return Ok(new { message = "Project deleted successfully" });
-
+            return NoContent();
         }
     }
 }
