@@ -1,17 +1,15 @@
-
-
 ## Project Overview
-.  
-This system demonstrates a modular architecture integrating **.NET 8 Web API**, **MongoDB**, and **Angular 18**.
 
----
+The requirement was to design develop a collaboration board to help small teams manage projects, assign tasks and communicate instantly. 
+I have developed a collaboration board by which a small team can manage projects and assign tasks. Due to shortage of time I was not able to develop the communication and notification functionality. 
 
 ##  Architecture Overview
 
 **Backend API** ASP.NET Core 8 Web API:  Handles authentication, projects, and tasks API.
 **Database** MongoDB: Stores users, projects, tasks, and chat history. 
 **Frontend**  Angular 18:  Responsive web client consuming APIs and listening on SignalR hub. 
----
+**Caching** Redis: for fast retrieval. 
+
 
 ## Features Implemented
 
@@ -20,17 +18,12 @@ This system demonstrates a modular architecture integrating **.NET 8 Web API**, 
   - JWT-based authentication
   - User registration with duplicate email validation
   - Password hashing
-  - Profile endpoint: `GET /api/users/{id}` with optional Redis caching
+  - Profile endpoint: `GET /api/users/{id}` with Redis caching
 
 - **Project Management**
-  - CRUD operations for projects
-  - Fields: `Name`, `Description`, `CreatedBy`, `Members`
-
-- **Task Management**
-  - Tasks belong to projects
-  - Fields: `Title`, `Description`, `Status`, `Assignee`, `DueDate`, `CreatedBy`, `CreatedAt`
-
----
+    - Projects: Users can create projects with a name, description, createdBy, and members list.
+    - Tasks: Tasks belong to projects and include: Title, Description, Status, Assignee, DueDate
+    - Caching: Cache frequently-read lists (e.g., tasks for a project) in Redis using keys and invalidate/update on changes.
 
 ### Frontend
 - **Authentication**
@@ -39,7 +32,6 @@ This system demonstrates a modular architecture integrating **.NET 8 Web API**, 
 - **Dashboard**
   - List all projects and their tasks
   - Task creation, editing, and deletion UI
-  - Clean gray-themed interface for usability
 
 
 
@@ -74,3 +66,6 @@ ng serve
 
 The frontend will run at:
 http://localhost:4200
+
+
+
