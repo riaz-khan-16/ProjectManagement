@@ -16,11 +16,13 @@ namespace ProjectManagementAPI.Controllers
     {
         private readonly MongoDbService _mongoService;
         private readonly IConfiguration _config;
+        private readonly IRedisService _redisService;
 
-        public AuthController(MongoDbService mongoService, IConfiguration config)
+        public AuthController(MongoDbService mongoService, IConfiguration config, IRedisService redisService)
         {
             _mongoService = mongoService;
             _config = config;
+            _redisService = redisService;
         }
 
         // POST: api/auth/register
@@ -47,12 +49,28 @@ namespace ProjectManagementAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginModel model)
         {
+            string cacheKey = $"user:auth:{model.Email}";
+
+            // Check Redis cache first
+            var cachedUser = await _redisService.GetAsync<User>(cacheKey);
+            if (cachedUser != null)
+            {
+                Console.WriteLine("✅ Returned user from Redis cache.");
+                if (VerifyPassword(model.Password, cachedUser.PasswordHash))
+                {
+                    var token = GenerateJwtToken(cachedUser);
+                    return Ok(new { token });
+                }
+                return Unauthorized("Invalid password");
+            }
+
+            // If not in cache, check MongoDB
             var user = await _mongoService.Users.Find(u => u.Email == model.Email).FirstOrDefaultAsync();
             if (user == null || !VerifyPassword(model.Password, user.PasswordHash))
                 return Unauthorized("Invalid credentials");
 
-            var token = GenerateJwtToken(user);
-            return Ok(new { token });
+            var jwtToken = GenerateJwtToken(user);
+            return Ok(new { token = jwtToken });
         }
 
         // --- Hashing ---
