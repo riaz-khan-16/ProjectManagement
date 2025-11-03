@@ -119,7 +119,10 @@ namespace ProjectManagementAPI.Controllers
 
             Console.WriteLine("Task created and caches cleared.");
 
-          
+
+            //// Publish an event to RabbitMQ
+            await _eventPublisher.PublishEvent("task_evts", $" {task.Title} Task added.");
+
 
             return CreatedAtAction(nameof(GetTask), new { id = task.Id }, task);
 
