@@ -47,7 +47,7 @@ namespace ProjectManagementAPI.Controllers
             var cachedProjects = await _redisService.GetAsync<List<Project>>(cacheKey);
             if (cachedProjects != null)
             {
-                Console.WriteLine("✅ Returned from Redis cache.");
+                Console.WriteLine(" Returned from Redis cache.");
                 return Ok(cachedProjects);
             }
 
