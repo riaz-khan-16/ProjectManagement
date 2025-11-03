@@ -11,13 +11,16 @@ namespace ProjectManagementAPI.Controllers
     {
         private readonly MongoDbService _mongoService;
         private readonly IRedisService _redisService;
-       
+        private readonly IEventPublisher _eventPublisher;
+
 
         public TasksController(MongoDbService mongoService, 
-            IRedisService redisService)
+            IRedisService redisService, IEventPublisher eventPublisher)
         {
             _mongoService = mongoService;
             _redisService = redisService;
+            _eventPublisher = eventPublisher;
+
             
         }
 
