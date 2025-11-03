@@ -83,10 +83,12 @@
             <div class="col-md-3">
                 <select [(ngModel)]="projectForm.assignedUserId" name="assignedUserId" class="form-select">
                 <option value="">-- Select User --</option>
-                <option *ngFor="let user of users" [value]="user.id">
+                <option *ngFor="let user of users" [value]="user.Id">
                     {{ user.Email }}
                 </option>
                 </select>
+
+                <button type="button" class="btn btn-primary" (click)="addUserId()">Add Member</button>
             </div>
 
 

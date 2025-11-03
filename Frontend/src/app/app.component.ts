@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class App {
   apiUrl = 'https://localhost:7162/api';
+   editingProject = false;
 
   users: any[] = [];  //  store users for dropdown
 
@@ -24,8 +25,15 @@ export class App {
 
   // --- Projects / Tasks ---
   projects: any[] = [];
-  projectForm: any = { id: null, name: '', description: '', membersStr: '' };
-  editingProject = false;
+  projectForm: any = { 
+id: null,
+  name: '',
+  description: '',
+  userIds: [],          // store selected user IDs
+  assignedUserId: '',    // currently selected user from dropdown
+  editingProject: false
+
+   };
 
   newTaskTitle: any = {};
   newTaskAssignee: any = {};
@@ -135,24 +143,40 @@ export class App {
       });
   }
 
-  
+  addUserId(): void {
+  const selectedUserId = this.projectForm.assignedUserId;
+
+  if (selectedUserId && !this.projectForm.userIds.includes(selectedUserId)) {
+    this.projectForm.userIds.push(selectedUserId); // add ID
+    this.projectForm.assignedUserId = '';          // reset dropdown
+  }
+}
 
   saveProject() {
     const payload = {
       name: this.projectForm.name,
       description: this.projectForm.description,
       
-      members: this.projectForm.membersStr ? this.projectForm.membersStr.split(',') : [],
-      assignedmembers: this.projectForm.assignedUserId ? this.projectForm.membersStr.split(',') : [],
+      userIds: this.projectForm.userIds,
       createdBy: this.userEmail,
       tasks: []
+
+
+
     };
     if (this.projectForm.id) {
       this.http.put(`${this.apiUrl}/Projects/${this.projectForm.id}`, payload, this.getAuthHeaders())
         .subscribe(() => { this.loadProjects(); this.cancelProjectEdit(); });
     } else {
       this.http.post(`${this.apiUrl}/Projects`, payload, this.getAuthHeaders())
-        .subscribe(() => { this.loadProjects(); this.projectForm = { id: null, name: '', description: '', membersStr: '' }; });
+        .subscribe(() => { this.loadProjects(); this.projectForm = {
+            id: null,
+            name: '',
+            description: '',
+            userIds: [],
+            assignedUserId: '' 
+            
+             }; });
     }
   }
 
