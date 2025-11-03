@@ -11,11 +11,14 @@ namespace ProjectManagementAPI.Controllers
     {
         private readonly MongoDbService _mongoService;
         private readonly IRedisService _redisService;
+       
 
-        public TasksController(MongoDbService mongoService, IRedisService redisService)
+        public TasksController(MongoDbService mongoService, 
+            IRedisService redisService)
         {
             _mongoService = mongoService;
             _redisService = redisService;
+            
         }
 
         // GET: api/tasks
@@ -28,7 +31,7 @@ namespace ProjectManagementAPI.Controllers
             var cachedTasks = await _redisService.GetAsync<List<TaskItem>>(cacheKey);
             if (cachedTasks != null)
             {
-                Console.WriteLine("✅ Returned all tasks from Redis cache.");
+                Console.WriteLine(" Returned all tasks from Redis cache.");
                 return Ok(cachedTasks);
             }
 
@@ -113,9 +116,11 @@ namespace ProjectManagementAPI.Controllers
 
             Console.WriteLine("Task created and caches cleared.");
 
-
+          
 
             return CreatedAtAction(nameof(GetTask), new { id = task.Id }, task);
+
+
 
 
         }
@@ -140,7 +145,7 @@ namespace ProjectManagementAPI.Controllers
             await _redisService.RemoveAsync($"task:{id}");
             await _redisService.RemoveAsync($"tasks:project:{updatedTask.ProjectId}");
 
-            Console.WriteLine("✏️ Task updated and caches cleared.");
+            Console.WriteLine(" Task updated and caches cleared.");
 
             return NoContent();
         }
