@@ -24,8 +24,9 @@ export class App {
   showRegister = false;
   token: string | null = null;
   userEmail = '';
-  userId='';
-  userName='';
+  
+  currentUserId: string | null = null;
+  currentUserName: string | null = null;
 
   authForm = { email: '', password: '', role: '', department: '', name:'' };
 
@@ -56,7 +57,11 @@ export class App {
     if (this.token) {
       this.isLoggedIn = true;
       this.userEmail = localStorage.getItem('userEmail') || '';
+      this.currentUserId = localStorage.getItem('userId');
+      this.currentUserName = localStorage.getItem('userName');
+      this.userEmail = localStorage.getItem('userEmail') || '';
       this.loadProjects();
+      
 
     }
     this.loadAllUsers();
@@ -100,15 +105,23 @@ export class App {
   
 
   login() {
-    this.http.post<{ token: string }>(`${this.apiUrl}/Auth/login`, this.authForm)
+    this.http.post<{ token: string, userId: string, email: string, name: string }>(`${this.apiUrl}/Auth/login`, this.authForm)
       .subscribe({
         next: res => {
           this.token = res.token;
           if (this.token) {
             localStorage.setItem('token', this.token);
             localStorage.setItem('userEmail', this.authForm.email);
+            localStorage.setItem('userId', res.userId);
+            localStorage.setItem('userName', res.name);
+
+
             this.isLoggedIn = true;
             this.userEmail = this.authForm.email;
+
+             // optional: store in component variables
+            this.currentUserId = res.userId;
+            this.currentUserName = res.name;
           
 
             this.loadProjects();
