@@ -121,7 +121,8 @@ namespace ProjectManagementAPI.Controllers
 
 
             //// Publish an event to RabbitMQ
-            await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
+            //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
+            await _eventPublisher.PublishEvent("Backend API Development", $" {task.Title} Task added.");
 
 
             return CreatedAtAction(nameof(GetTask), new { id = task.Id }, task);

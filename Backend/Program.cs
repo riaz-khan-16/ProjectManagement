@@ -26,6 +26,7 @@ builder.Services.AddSingleton(new ConnectionFactory()
 });
 
 builder.Services.AddSingleton<IEventPublisher, EventPublisher>();
+builder.Services.AddSingleton<IEventConsumer, EventConsumer>();
 
 
 
