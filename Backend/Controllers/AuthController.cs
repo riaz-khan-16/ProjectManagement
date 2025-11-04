@@ -36,6 +36,7 @@ namespace ProjectManagementAPI.Controllers
 
             var user = new User
             {
+                Name = model.Name,
                 Email = model.Email,
                 PasswordHash = HashPassword(model.Password),
                 Role = model.Role ?? "User",
@@ -71,7 +72,14 @@ namespace ProjectManagementAPI.Controllers
                 return Unauthorized("Invalid credentials");
 
             var jwtToken = GenerateJwtToken(user);
-            return Ok(new { token = jwtToken });
+            return Ok(new {
+                token = jwtToken,
+                userId = user.Id,
+                email = user.Email,
+                name=user.Name,
+             
+
+            });
         }
 
         // --- Hashing ---

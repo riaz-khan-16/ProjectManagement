@@ -34,6 +34,12 @@
             <div class="col-md-4" *ngIf="showRegister">
               <input type="text" [(ngModel)]="authForm.department" name="department" class="form-control" placeholder="Department" required />
             </div>
+            <!-- name -->
+            <div class="col-md-4" *ngIf="showRegister">
+              <input type="text" [(ngModel)]="authForm.name" name="name" class="form-control" placeholder="Name" />
+            </div>
+
+
           <div class="col-md-4">
             <button type="submit" class="btn btn-primary w-100">{{ showRegister ? 'Register' : 'Login' }}</button>
           </div>
@@ -58,7 +64,7 @@
 
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Welcome, {{ userEmail }}  {{ userEmail }} </h3>
+        <h3>Welcome, {{ userEmail }}  </h3>
         <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
       </div>
 
@@ -125,7 +131,7 @@
                 <td>
                   <ng-container *ngIf="project.userIds && project.userIds.length > 0; else noMembers">
                     <span *ngFor="let id of project.userIds; let i = index">
-                      {{ getUserEmailById(id) }}<span *ngIf="i < project.userIds.length - 1">, </span>
+                      {{ getUserNameById(id) }}<span *ngIf="i < project.userIds.length - 1">, </span>
                     </span>
                   </ng-container>
                   <ng-template #noMembers>—</ng-template>

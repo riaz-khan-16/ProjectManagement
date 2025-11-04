@@ -3,6 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+
+
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -21,12 +24,15 @@ export class App {
   showRegister = false;
   token: string | null = null;
   userEmail = '';
-  authForm = { email: '', password: '', role: '', department: '' };
+  userId='';
+  userName='';
+
+  authForm = { email: '', password: '', role: '', department: '', name:'' };
 
   // --- Projects / Tasks ---
   projects: any[] = [];
   projectForm: any = { 
-id: null,
+  id: null,
   name: '',
   description: '',
   userIds: [],          // store selected user IDs
@@ -78,18 +84,20 @@ id: null,
       email: this.authForm.email,
       password: this.authForm.password,
       role: this.authForm.role,
-      department: this.authForm.department
+      department: this.authForm.department,
+      name:this.authForm.name
     };
     this.http.post(`${this.apiUrl}/Auth/register`, payload, { responseType: 'text' })
       .subscribe({
         next: () => {
           alert('Registration successful! Please login.');
           this.showRegister = false;
-          this.authForm = { email: '', password: '', role: '', department: '' };
+          this.authForm = { email: '', password: '', role: '', department: '', name:'' };
         },
         error: err => alert('Registration failed: ' + err.error)
       });
   }
+  
 
   login() {
     this.http.post<{ token: string }>(`${this.apiUrl}/Auth/login`, this.authForm)
@@ -101,6 +109,8 @@ id: null,
             localStorage.setItem('userEmail', this.authForm.email);
             this.isLoggedIn = true;
             this.userEmail = this.authForm.email;
+          
+
             this.loadProjects();
           }
         },
@@ -155,6 +165,11 @@ id: null,
 getUserEmailById(id: string): string {
   const user = this.users.find(u => u.Id === id);
   return user ? user.Email : 'Unknown';
+}
+
+getUserNameById(id: string): string {
+  const user = this.users.find(u => u.Id === id);
+  return user ? user.Name : 'Unknown';
 }
 
 

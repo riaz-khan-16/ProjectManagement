@@ -19,5 +19,6 @@ namespace ProjectManagementAPI.Models
 
         public string Role { get; set; } = "User";
         public string? Department { get; set; }
+        public string Name { get; internal set; }
     }
 }

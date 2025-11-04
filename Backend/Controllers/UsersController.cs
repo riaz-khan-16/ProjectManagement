@@ -46,7 +46,9 @@ namespace ProjectManagementAPI.Controllers
                     u.Id,
                     u.Email,
                     u.Role,
-                    u.Department
+                    u.Department,
+                    u.Name,
+
                 })
                 .ToListAsync();                   // converts the results to a list
 
