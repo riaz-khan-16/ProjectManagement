@@ -152,6 +152,12 @@ id: null,
   }
 }
 
+getUserEmailById(id: string): string {
+  const user = this.users.find(u => u.Id === id);
+  return user ? user.Email : 'Unknown';
+}
+
+
   saveProject() {
     const payload = {
       name: this.projectForm.name,
@@ -166,7 +172,10 @@ id: null,
     };
     if (this.projectForm.id) {
       this.http.put(`${this.apiUrl}/Projects/${this.projectForm.id}`, payload, this.getAuthHeaders())
-        .subscribe(() => { this.loadProjects(); this.cancelProjectEdit(); });
+        .subscribe(() => { 
+          alert('Project updated successfully');
+          this.loadProjects(); this.cancelProjectEdit(); 
+        });
     } else {
       this.http.post(`${this.apiUrl}/Projects`, payload, this.getAuthHeaders())
         .subscribe(() => { this.loadProjects(); this.projectForm = {
@@ -180,7 +189,13 @@ id: null,
     }
   }
 
-  editProject(project: any) { this.projectForm = { ...project, membersStr: project.members.join(',') }; this.editingProject = true; }
+  editProject(project: any) {
+     this.projectForm = { 
+    ...project, membersStr: project.members.join(',') 
+  };
+   this.editingProject = true; }
+
+
   cancelProjectEdit() { this.projectForm = { id: null, name: '', description: '', membersStr: '' }; this.editingProject = false; }
   deleteProject(id: string) { if (!confirm('Delete this project?')) return; this.http.delete(`${this.apiUrl}/Projects/${id}`, this.getAuthHeaders()).subscribe(() => this.loadProjects()); }
 

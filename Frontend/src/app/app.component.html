@@ -58,7 +58,7 @@
 
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Welcome, {{ userEmail }}</h3>
+        <h3>Welcome, {{ userEmail }}  {{ userEmail }} </h3>
         <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
       </div>
 
@@ -110,6 +110,7 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Created By</th>
+                <th>User Ids</th>
                 <th>Members</th>
                 <th>Tasks</th>
                 <th>Actions</th>
@@ -120,6 +121,17 @@
                 <td>{{ project.name }}</td>
                 <td>{{ project.description }}</td>
                 <td>{{ project.createdBy }}</td>
+                <!-- <td>{{ project.userIds }}</td> -->
+                <td>
+                  <ng-container *ngIf="project.userIds && project.userIds.length > 0; else noMembers">
+                    <span *ngFor="let id of project.userIds; let i = index">
+                      {{ getUserEmailById(id) }}<span *ngIf="i < project.userIds.length - 1">, </span>
+                    </span>
+                  </ng-container>
+                  <ng-template #noMembers>—</ng-template>
+                </td>
+               
+                 
                 <td>{{ project.members.join(', ') }}</td>
 
                 <!-- Tasks Column -->

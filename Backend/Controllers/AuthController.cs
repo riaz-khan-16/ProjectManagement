@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using ProjectManagementAPI.Models;
 using ProjectManagementAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MongoDB.Driver;
 
 namespace ProjectManagementAPI.Controllers
 {
@@ -55,7 +56,7 @@ namespace ProjectManagementAPI.Controllers
             var cachedUser = await _redisService.GetAsync<User>(cacheKey);
             if (cachedUser != null)
             {
-                Console.WriteLine("✅ Returned user from Redis cache.");
+                Console.WriteLine(" Returned user from Redis cache.");
                 if (VerifyPassword(model.Password, cachedUser.PasswordHash))
                 {
                     var token = GenerateJwtToken(cachedUser);
@@ -94,6 +95,7 @@ namespace ProjectManagementAPI.Controllers
 
             var claims = new[]
             {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
@@ -109,5 +111,7 @@ namespace ProjectManagementAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+    
     }
 }
