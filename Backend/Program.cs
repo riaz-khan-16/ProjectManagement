@@ -4,6 +4,7 @@ using ProjectManagementAPI.Services;
 using ProjectManagementAPI.Settings;
 using RabbitMQ.Client;
 using StackExchange.Redis;
+using ProjectManagementAPI.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +26,13 @@ builder.Services.AddSingleton(new ConnectionFactory()
     Password = "guest"
 });
 
+// event publisher and consumer using RabbitMQ
 builder.Services.AddSingleton<IEventPublisher, EventPublisher>();
 builder.Services.AddSingleton<IEventConsumer, EventConsumer>();
+
+// SignalR
+builder.Services.AddSignalR();
+
 
 
 
@@ -52,6 +58,11 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
+
+// Example: send a test notification when app starts
+var eventPublisher = app.Services.GetRequiredService<IEventPublisher>();
+await eventPublisher.PublishEvent("Backend API Development", "Test notification on startup");
+
 // --- Swagger ---
 if (app.Environment.IsDevelopment())
 {
@@ -65,4 +76,6 @@ app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())
 app.UseMiddleware<JwtMiddleware>();
 
 app.MapControllers();
+
+app.MapHub<NotificationHub>("/hubs/notifications"); // frontend will connect here
 app.Run();

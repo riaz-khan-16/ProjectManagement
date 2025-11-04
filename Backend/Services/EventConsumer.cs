@@ -1,7 +1,11 @@
 ﻿
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using ProjectManagementAPI.Hubs;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+
 
 
 namespace ProjectManagementAPI.Services
@@ -9,10 +13,12 @@ namespace ProjectManagementAPI.Services
     public class EventConsumer: IEventConsumer
     {
         private readonly ConnectionFactory  _factory;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public EventConsumer(ConnectionFactory factory)
+        public EventConsumer(ConnectionFactory factory, IHubContext<NotificationHub> hubContext)
         {
             _factory = factory;
+            _hubContext = hubContext;
         }
 
         public async Task StartListeningAsync(string queueName)
@@ -45,7 +51,11 @@ namespace ProjectManagementAPI.Services
                 Console.WriteLine($" [x] Received from queue '{queueName}': {message}");
 
                 // You can later send this to SignalR or process further
-                await Task.CompletedTask;
+
+                // Send message to all connected SignalR clients
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
+
+                //await Task.CompletedTask;
             };
 
             // 6️ Start consuming
