@@ -18,6 +18,7 @@ export class App {
    editingProject = false;
 
   users: any[] = [];  //  store users for dropdown
+  userProjects: any[] = []; // Projects assigned to the current user
 
   // --- Auth ---
   isLoggedIn = false;
@@ -67,7 +68,7 @@ export class App {
     this.loadAllUsers();
   }
 
-   // 🔹 Method to fetch users and log them
+   //  Method to fetch users and log them
 
   loadAllUsers(): void {
     this.http.get<any[]>(`${this.apiUrl}/Users`).subscribe({
@@ -158,6 +159,10 @@ export class App {
                 this.projects.forEach(project => {
                   project.tasks = tasks.filter(task => task.projectId === project.id);
                 });
+
+                // Filter projects for current user
+            this.showCurrentUserProjects();
+
               },
               error: err => console.error('Failed to load tasks', err)
             });
@@ -165,6 +170,17 @@ export class App {
         error: err => { console.error('Failed to load projects', err); if (err.status === 401) this.logout(); }
       });
   }
+
+  //to see assigned projects of the currrent user
+  showCurrentUserProjects() {
+  if (!this.currentUserId) return;
+
+  this.userProjects = this.projects.filter(project =>
+    project.userIds.includes(this.currentUserId)
+  );
+  console.log('Assigned projects for the current user:', this.userProjects);
+}
+
 
   addUserId(): void {
   const selectedUserId = this.projectForm.assignedUserId;

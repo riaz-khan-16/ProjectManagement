@@ -75,8 +75,25 @@
         </div>
       </div>
 
+      <div class="card mb-4">
+  <div class="card-header">
+    <h5>My Projects</h5>
+  </div>
+  <div class="card-body" *ngIf="userProjects.length; else noProjects">
+    <ul class="list-group">
+      <li *ngFor="let project of userProjects" class="list-group-item">
+        {{ project.name }} -id ({{ project.id }})
+       
+      </li>
+    </ul>
+  </div>
+  <ng-template #noProjects>
+    <p>No projects assigned to you.</p>
+  </ng-template>
+</div>
 
-      
+
+
 
 
 
