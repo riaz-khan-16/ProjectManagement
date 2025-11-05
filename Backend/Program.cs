@@ -29,6 +29,9 @@ builder.Services.AddSingleton(new ConnectionFactory()
 // event publisher and consumer using RabbitMQ
 builder.Services.AddSingleton<IEventPublisher, EventPublisher>();
 builder.Services.AddSingleton<IEventConsumer, EventConsumer>();
+builder.Services.AddHostedService<RabbitMqHostedService>();
+
+
 
 // SignalR
 builder.Services.AddSignalR();
@@ -58,10 +61,6 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-
-// Example: send a test notification when app starts
-var eventPublisher = app.Services.GetRequiredService<IEventPublisher>();
-await eventPublisher.PublishEvent("Backend API Development", "Test notification on startup");
 
 // --- Swagger ---
 if (app.Environment.IsDevelopment())

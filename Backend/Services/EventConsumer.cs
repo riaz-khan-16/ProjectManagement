@@ -1,79 +1,63 @@
-﻿
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using ProjectManagementAPI.Hubs;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
-
-
 namespace ProjectManagementAPI.Services
 {
-    public class EventConsumer: IEventConsumer
+    public interface IEventConsumer
     {
-        private readonly ConnectionFactory  _factory;
-        private readonly IHubContext<NotificationHub> _hubContext;
+        Task StartAsync(string queueName, CancellationToken cancellationToken = default);
+    }
 
-        public EventConsumer(ConnectionFactory factory, IHubContext<NotificationHub> hubContext)
+    public class EventConsumer : IEventConsumer
+    {
+        private readonly ConnectionFactory _factory;
+
+        public EventConsumer()
         {
-            _factory = factory;
-            _hubContext = hubContext;
+            _factory = new ConnectionFactory
+            {
+                HostName = "localhost"
+            };
         }
 
-        public async Task StartListeningAsync(string queueName)
+        public async Task StartAsync(string queueName, CancellationToken cancellationToken = default)
         {
-
-            // 1️ Create connection
             using var connection = await _factory.CreateConnectionAsync();
+            using var channel = await connection.CreateChannelAsync(); // or CreateChannelAsync if available
 
-            // 2️ Create channel
-            using var channel = await connection.CreateChannelAsync();
-
-            // 3️ Declare the same queue as your publisher
             await channel.QueueDeclareAsync(
                 queue: queueName,
                 durable: false,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null
-            );
+                arguments: null);
 
-            // 4️ Create consumer
+            Console.WriteLine($" [*] Waiting for messages on queue: {queueName}");
+
             var consumer = new AsyncEventingBasicConsumer(channel);
-
-            // 5️ Handle messages
             consumer.ReceivedAsync += async (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
+                Console.WriteLine($" [x] Received: {message}");
 
-                Console.WriteLine($" [x] Received from queue '{queueName}': {message}");
+                // Here you can integrate SignalR to broadcast to clients:
+                // await _hubContext.Clients.All.SendAsync("ReceiveMessage", message);
 
-                // You can later send this to SignalR or process further
-
-                // Send message to all connected SignalR clients
-                await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
-
-                //await Task.CompletedTask;
+                await Task.Yield();
             };
 
-            // 6️ Start consuming
             await channel.BasicConsumeAsync(
                 queue: queueName,
                 autoAck: true,
-                consumer: consumer
-            );
+                consumer: consumer);
 
-
-
-
-
-
+            // Keep the consumer alive
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await Task.Delay(1000, cancellationToken);
+            }
         }
-
-
-
-
     }
 }
