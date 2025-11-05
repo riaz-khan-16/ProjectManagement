@@ -1,10 +1,10 @@
-﻿
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
+
 namespace ProjectManagementAPI.Hubs
 {
-    public class NotificationHub:Hub
+    // This hub acts as the communication channel between backend and frontend
+    public class NotificationHub : Hub
     {
-
-
+        // You can add server-to-client or client-to-server methods here if needed
     }
 }

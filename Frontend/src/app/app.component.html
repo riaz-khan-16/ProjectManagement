@@ -1,5 +1,12 @@
 <div class="container my-5">
 
+  <div class="notifications">
+  <h3>Live Notifications:</h3>
+  <ul>
+    <li *ngFor="let msg of messages">{{ msg }}</li>
+  </ul>
+</div>
+
     <!-- Title -->
     <h1 class="mb-4 text-center">Project and Tasks Management Dashboard</h1>
 

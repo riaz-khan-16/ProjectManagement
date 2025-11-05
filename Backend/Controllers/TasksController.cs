@@ -117,7 +117,7 @@ namespace ProjectManagementAPI.Controllers
             await _redisService.RemoveAsync("tasks:all");
             await _redisService.RemoveAsync($"tasks:project:{task.ProjectId}");
 
-            Console.WriteLine("Task created and caches cleared.");
+            
 
 
             //// Publish an event to RabbitMQ

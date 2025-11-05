@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>Hi</h1>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script>
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:7162/hubs/notifications") // your backend URL + hub route
+    .build();
+
+  // This matches the method name used in SendAsync("ReceiveNotification", ...)
+  connection.on("ReceiveNotification", (message) => {
+    console.log("📩 Notification from backend:", message);
+    // You can update UI, show toast, append message, etc.
+  });
+
+  connection.start()
+    .then(() => console.log("✅ Connected to SignalR hub"))
+    .catch(err => console.error("❌ SignalR connection failed:", err));
+</script>
+
+</html>

@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as signalR from '@microsoft/signalr';
+
 
 
 
@@ -50,10 +52,17 @@ export class App {
   editingTaskProjectId = '';
 
 
+  messages: string[] = []; // store incoming notifications
+  hubConnection!: signalR.HubConnection;
+
+
+
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
+     this.startSignalRConnection(); // connect first
+  
     this.token = localStorage.getItem('token');
     if (this.token) {
       this.isLoggedIn = true;
@@ -66,9 +75,33 @@ export class App {
 
     }
     this.loadAllUsers();
+   
   }
 
    //  Method to fetch users and log them
+
+   async startSignalRConnection() {
+  this.hubConnection = new signalR.HubConnectionBuilder()
+    .withUrl('https://localhost:7162/hubs/notifications')
+    .withAutomaticReconnect()   // retry if disconnected
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+  // Listen for backend notifications
+  this.hubConnection.on('ReceiveNotification', (message: string) => {
+    console.log('📩 New notification:', message);
+    this.messages.push(message);
+  });
+
+  try {
+    await this.hubConnection.start();
+    console.log('✅ Connected to SignalR hub');
+  } catch (err) {
+    console.error('❌ SignalR connection error:', err);
+    setTimeout(() => this.startSignalRConnection(), 5000); // retry
+  }
+}
+
 
   loadAllUsers(): void {
     this.http.get<any[]>(`${this.apiUrl}/Users`).subscribe({

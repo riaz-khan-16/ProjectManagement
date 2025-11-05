@@ -52,12 +52,23 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 // Register custom Redis service
 builder.Services.AddScoped<IRedisService, RedisService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowed(_ => true); // allow any origin for dev
+    });
+});
 
 // --- Controllers and Swagger ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors();
+//builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -71,7 +82,7 @@ if (app.Environment.IsDevelopment())
 
 // --- Middleware ---
 app.UseHttpsRedirection();
-app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseCors();
 app.UseMiddleware<JwtMiddleware>();
 
 app.MapControllers();
