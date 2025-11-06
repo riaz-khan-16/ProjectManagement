@@ -86,20 +86,54 @@ export class App {
     .withAutomaticReconnect()   // retry if disconnected
     .configureLogging(signalR.LogLevel.Information)
     .build();
+    
+
+
 
   // Listen for backend notifications
   this.hubConnection.on('ReceiveNotification', (message: string) => {
-    console.log('📩 New notification:', message);
+    console.log(' New notification:', message);
     this.messages.push(message);
   });
 
   try {
     await this.hubConnection.start();
-    console.log('✅ Connected to SignalR hub');
+    console.log(' Connected to SignalR hub');
   } catch (err) {
-    console.error('❌ SignalR connection error:', err);
+    console.error(' SignalR connection error:', err);
     setTimeout(() => this.startSignalRConnection(), 5000); // retry
   }
+}
+
+
+// ---------------------------------------------------------------
+// Called after projects and tasks are loaded for the logged-in user
+joinSignalRGroups() {
+  if (!this.hubConnection || this.hubConnection.state !== signalR.HubConnectionState.Connected) {
+    console.warn('⚠️ Hub not connected yet, skipping group join.');
+    return;
+  }
+
+  const projectIds = this.userProjects.map(p => p.id);
+  console.log(' Joining groups for projects:', projectIds);
+
+  this.hubConnection.invoke('JoinProjectGroups', projectIds)
+    .then(() => console.log(' Joined project groups on SignalR'))
+    .catch(err => console.error(' Error joining groups:', err));
+}
+
+
+ //to see assigned projects of the currrent user
+  showCurrentUserProjects() {
+  if (!this.currentUserId) return;
+
+  this.userProjects = this.projects.filter(project =>
+    project.userIds.includes(this.currentUserId)
+  );
+  console.log('Assigned projects for the current user:', this.userProjects);
+  this.joinSignalRGroups();
+
+
 }
 
 
@@ -204,15 +238,7 @@ export class App {
       });
   }
 
-  //to see assigned projects of the currrent user
-  showCurrentUserProjects() {
-  if (!this.currentUserId) return;
-
-  this.userProjects = this.projects.filter(project =>
-    project.userIds.includes(this.currentUserId)
-  );
-  console.log('Assigned projects for the current user:', this.userProjects);
-}
+ 
 
 
   addUserId(): void {
