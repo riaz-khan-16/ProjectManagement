@@ -55,6 +55,20 @@ export class App {
   messages: string[] = []; // store incoming notifications
   hubConnection!: signalR.HubConnection;
   toastMessages: string[] = []; // for toast message
+ sms: {
+  projectId: string;
+  senderId: string;
+  senderName: string;
+  message: string;
+}[] = []; // <-- initialize to empty array
+
+
+  //for team chat
+  openChatProjectId: string | null = null;
+  newProjectMessage: { [projectId: string]: string } = {};
+// stores new message for each project
+
+
 
 
 
@@ -127,6 +141,48 @@ joinSignalRGroups() {
     .catch(err => console.error(' Error joining groups:', err));
 }
 
+// sent project message using SignalR
+
+  //for team chat
+  sendProjectMessage(projectId: string) {
+  console.log('Sending teamchat msg to the project id: ', projectId);
+  
+  const message = this.newProjectMessage[projectId]?.trim();
+  if (!message) return;
+   
+  console.log("the message is: ",message);
+
+
+  this.sms.push({
+    projectId: projectId,
+    senderId: this.currentUserId || 'unknown',
+    senderName: this.currentUserName || 'Me',
+    message: message
+  });
+
+  console.log(this.sms);
+
+  // Optionally clear input
+  this.newProjectMessage[projectId] = '';
+
+  
+
+  // Send to backend via SignalR if you want
+  // this.hubConnection.invoke('SendProjectMessage', projectId, message, this.currentUserName);
+}
+//for team chat
+getProjectNameById(projectId: string): string {
+  const project = this.projects.find(p => p.id === projectId);
+  return project ? project.name : 'Unknown Project';
+}
+
+
+//for teamchat
+
+getMessagesForProject(projectId: string) {
+  if (!this.sms) return [];
+  return this.sms.filter(m => m.projectId === projectId);
+}
 
  //to see assigned projects of the currrent user
   showCurrentUserProjects() {

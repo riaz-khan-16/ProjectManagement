@@ -167,7 +167,7 @@
                 <th>Description</th>
                 <th>Created By</th>
                 <th>User Ids</th>
-                <th>Members</th>
+                <th>Team Chat</th>
                 <th>Tasks</th>
                 <th>Actions</th>
               </tr>
@@ -176,7 +176,8 @@
               <tr *ngFor="let project of projects">
                 <td>{{ project.name }}</td>
                 <td>{{ project.description }}</td>
-                <td>{{ project.createdBy }}</td>
+                <td></td>
+                
                 <!-- <td>{{ project.userIds }}</td> -->
                 <td>
                   <ng-container *ngIf="project.userIds && project.userIds.length > 0; else noMembers">
@@ -188,7 +189,7 @@
                 </td>
                
                  
-                <td>{{ project.members.join(', ') }}</td>
+                <td><button class="btn btn-sm btn-primary ms-1" (click)="openChatProjectId = project.id ">Chat</button></td>
 
                 <!-- Tasks Column -->
                 <td class="tasks-column">
@@ -216,6 +217,7 @@
                           </div>
 
                         </div>
+                      
 
                   <!-- Add Task Inputs -->
                   <div class="input-group input-group-sm mt-2">
@@ -225,13 +227,22 @@
                     <button class="btn btn-primary" (click)="createTask(project.id)">Add</button>
                   </div>
                 </td>
+                
+
+            
 
                 <!-- Project Actions -->
                 <td>
                   <button class="btn btn-sm btn-success" (click)="editProject(project)">Edit</button>
                   <button class="btn btn-sm btn-danger ms-1" (click)="deleteProject(project.id)">Delete</button>
+
+                  
                 </td>
               </tr>
+
+
+            
+
             </tbody>
           </table>
         </div>
@@ -239,3 +250,39 @@
 
     </div>
   </div>
+
+
+  <!-- Team Chat Modal -->
+<div class="modal fade show" tabindex="-1" style="display: block;" *ngIf="openChatProjectId">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Team Chat - {{ openChatProjectId }}</h5>
+        <button type="button" class="btn-close" (click)="openChatProjectId = null"></button>
+      </div>
+
+      <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+        <!-- <div *ngIf="sms && sms.length > 0; else noMessages">
+          <div *ngFor="let msg of sms.filter(m => m.projectId === openChatProjectId)">
+            <strong>{{ msg.senderName }}:</strong> {{ msg.message }}
+          </div>
+        </div> -->
+        <ng-template #noMessages>
+          <em>No messages yet</em>
+        </ng-template>
+      </div>
+
+      <div class="modal-footer">
+        <input type="text" class="form-control me-2"
+               [(ngModel)]="newProjectMessage[openChatProjectId]" 
+               placeholder="Type a message..." /> 
+        <button class="btn btn-primary" (click)="sendProjectMessage(openChatProjectId!)">Send</button>
+        <button class="btn btn-secondary" (click)="openChatProjectId = null">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="openChatProjectId"></div>
+

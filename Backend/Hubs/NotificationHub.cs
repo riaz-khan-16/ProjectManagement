@@ -22,6 +22,15 @@ namespace ProjectManagementAPI.Hubs
         }
 
 
+        // Send message to a project group
+        public async Task SendMessageToProject(Guid projectId, string message, string senderName)
+        {
+            await Clients.Group($"project-{projectId}")
+                         .SendAsync("ReceiveProjectMessage", new { senderName, message });
+        }
+
+
+
 
 
     }
