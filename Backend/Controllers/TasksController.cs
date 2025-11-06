@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using ProjectManagementAPI.Models;
 using ProjectManagementAPI.Services;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ProjectManagementAPI.Controllers
@@ -118,13 +119,24 @@ namespace ProjectManagementAPI.Controllers
             await _redisService.RemoveAsync("tasks:all");
             await _redisService.RemoveAsync($"tasks:project:{task.ProjectId}");
 
-            
+
+            // Create a structured message for RabbitMQ
+            var message = new ProjectMessage
+            {
+                ProjectId = task.ProjectId,
+                Content = $"Task '{task.Title}' is Created!!"
+            };
+
+            var jsonMessage = JsonSerializer.Serialize(message);
 
 
             //// Publish an event to RabbitMQ
             //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
-            await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {task.Title} is created ...... Project id:{task.ProjectId} ");
+            await _eventPublisher.PublishEvent("Backend API Development", jsonMessage);
 
+            //// Publish an event to RabbitMQ
+            //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
+           // await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {task.Title} is created ...... Project id:{task.ProjectId} ");
 
             return CreatedAtAction(nameof(GetTask), new { id = task.Id }, task);
 
@@ -155,9 +167,22 @@ namespace ProjectManagementAPI.Controllers
 
 
             //// Publish an event to RabbitMQ
-            //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
-            await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {updatedTask.Title} is Updated ...... Project id:{updatedTask.ProjectId} ");
+            ////await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
+            //await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {updatedTask.Title} is Updated ...... Project id:{updatedTask.ProjectId} ");
 
+            // Create a structured message for RabbitMQ
+            var message = new ProjectMessage
+            {
+                ProjectId = updatedTask.ProjectId,
+                Content = $"Task '{updatedTask.Title}' is Updated."
+            };
+
+            var jsonMessage = JsonSerializer.Serialize(message);
+
+
+            //// Publish an event to RabbitMQ
+            //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
+            await _eventPublisher.PublishEvent("Backend API Development", jsonMessage);
             Console.WriteLine(" Task updated and caches cleared.");
 
             return NoContent();
@@ -179,12 +204,19 @@ namespace ProjectManagementAPI.Controllers
             await _redisService.RemoveAsync($"tasks:project:{task.ProjectId}");
 
 
+            // Create a structured message for RabbitMQ
+            var message = new ProjectMessage
+            {
+                ProjectId = task.ProjectId,
+                Content = $"Task '{task.Title}' was Deleted."
+            };
 
+            var jsonMessage = JsonSerializer.Serialize(message);
 
 
             //// Publish an event to RabbitMQ
             //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
-            await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {task.Title} is Deleted ...... Project id:{task.ProjectId} ");
+            await _eventPublisher.PublishEvent("Backend API Development", jsonMessage);
 
             Console.WriteLine(" Task deleted and caches cleared.");
             return NoContent();

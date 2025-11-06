@@ -54,6 +54,9 @@ export class App {
 
   messages: string[] = []; // store incoming notifications
   hubConnection!: signalR.HubConnection;
+  // In your App component
+  toastMessages: string[] = [];
+
 
 
 
@@ -94,6 +97,9 @@ export class App {
   this.hubConnection.on('ReceiveNotification', (message: string) => {
     console.log(' New notification:', message);
     this.messages.push(message);
+
+    // Show as toast
+  this.showToast(message);
   });
 
   try {
@@ -134,6 +140,24 @@ joinSignalRGroups() {
   this.joinSignalRGroups();
 
 
+}
+
+// Show toast method
+showToast(message: string) {
+  this.toastMessages.push(message);
+
+  // Automatically remove after 5 seconds
+  setTimeout(() => {
+    this.removeToast(message);
+  }, 50000);
+}
+
+// Remove a toast manually
+removeToast(message: string) {
+  const index = this.toastMessages.indexOf(message);
+  if (index !== -1) {
+    this.toastMessages.splice(index, 1);
+  }
 }
 
 

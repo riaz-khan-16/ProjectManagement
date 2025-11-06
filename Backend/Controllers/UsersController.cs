@@ -30,10 +30,10 @@ namespace ProjectManagementAPI.Controllers
             var cachedUsers = await _redisService.GetAsync<List<object>>(cacheKey);
             if (cachedUsers != null)
             {
-                
-                    Console.WriteLine("Returned from Redis cache.");
-                    return Ok(cachedUsers);
-                
+
+                Console.WriteLine("Returned from Redis cache.");
+                return Ok(cachedUsers);
+
 
             }
 
@@ -57,7 +57,7 @@ namespace ProjectManagementAPI.Controllers
 
 
             // Store in Redis cache for 10 minutes
-            await _redisService.SetAsync(cacheKey, users, TimeSpan.FromMinutes(10));
+            await _redisService.SetAsync(cacheKey, users, TimeSpan.FromMinutes(1));
             Console.WriteLine("Returned from MongoDB and cached in Redis.");
 
 
@@ -104,7 +104,7 @@ namespace ProjectManagementAPI.Controllers
 
 
             // Cache user profile for 10 minutes
-            await _redisService.SetAsync(cacheKey, user, TimeSpan.FromMinutes(10));
+            await _redisService.SetAsync(cacheKey, user, TimeSpan.FromMinutes(1));
             Console.WriteLine("Returned from MongoDB and cached in Redis.");
 
 

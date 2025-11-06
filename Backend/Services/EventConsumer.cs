@@ -3,6 +3,8 @@ using ProjectManagementAPI.Hubs;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+using System.Text.Json;
+
 
 namespace ProjectManagementAPI.Services
 {   
@@ -58,7 +60,29 @@ namespace ProjectManagementAPI.Services
                 var body = ea.Body.ToArray(); // Extracts the message body (binary data).
                 var message = Encoding.UTF8.GetString(body); // Converts the byte array to a human-readable UTF-8 string.
                 Console.WriteLine($" [x] Received: {message}");  // Prints the received message to the console.
-                await _hubContext.Clients.All.SendAsync("ReceiveNotification", message); // Broadcast the received message to all connected SignalR clients
+                                                                 //await _hubContext.Clients.All.SendAsync("ReceiveNotification", message); // Broadcast the received message to all connected SignalR clients
+
+                try
+                {
+                    // Deserialize the message into a project notification
+                    var payload = JsonSerializer.Deserialize<ProjectMessage>(message);
+
+                    if (payload != null)
+                    {
+                        // Send to the specific project group
+                        var groupName = $"project-{payload.ProjectId}";
+                        await _hubContext.Clients.Group(groupName)
+                            .SendAsync("ReceiveNotification", payload.Content);
+
+                        Console.WriteLine($" [>] Sent notification to group {groupName}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($" [!] Error processing message: {ex.Message}");
+                }
+
+
                 await Task.Yield();  // Returns control back to the event loop (good async practice).
             };
 
@@ -71,5 +95,16 @@ namespace ProjectManagementAPI.Services
             await Task.Delay(-1, cancellationToken); // Keep the consumer alive indefinitely
 
         }
+
+
     }
+
+
+    // Helper class to deserialize messages from RabbitMQ
+    public class ProjectMessage
+    {
+        public Guid ProjectId { get; set; }
+        public string Content { get; set; }
+    }
+
 }
