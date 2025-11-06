@@ -54,8 +54,7 @@ export class App {
 
   messages: string[] = []; // store incoming notifications
   hubConnection!: signalR.HubConnection;
-  // In your App component
-  toastMessages: string[] = [];
+  toastMessages: string[] = []; // for toast message
 
 
 
@@ -116,7 +115,7 @@ export class App {
 // Called after projects and tasks are loaded for the logged-in user
 joinSignalRGroups() {
   if (!this.hubConnection || this.hubConnection.state !== signalR.HubConnectionState.Connected) {
-    console.warn('⚠️ Hub not connected yet, skipping group join.');
+    console.warn(' !!!Hub not connected yet, skipping group join.');
     return;
   }
 

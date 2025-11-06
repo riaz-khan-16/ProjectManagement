@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using ProjectManagementAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using System.Security.Claims;
+using System.Text;
 
 namespace ProjectManagementAPI.Middlewares
 {
@@ -45,9 +46,18 @@ namespace ProjectManagementAPI.Middlewares
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
+
+                var Id = jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
                 var email = jwtToken.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+                var name = jwtToken.Claims.First(x => x.Type == ClaimTypes.Email).Value;
+
 
                 context.Items["UserEmail"] = email;
+
+                context.Items["UserName"] = name;
+                context.Items["UserId"] = Id;
+
+
             }
             catch
             {

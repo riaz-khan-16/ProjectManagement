@@ -105,6 +105,8 @@ namespace ProjectManagementAPI.Controllers
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.Email, user.Name),
+
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };

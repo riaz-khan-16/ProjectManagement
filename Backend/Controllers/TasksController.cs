@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using ProjectManagementAPI.Models;
 using ProjectManagementAPI.Services;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -106,6 +107,8 @@ namespace ProjectManagementAPI.Controllers
             return Ok(tasks);
         }
 
+        // Helper property to get current user
+        private string? UserEmail => HttpContext.Items["UserId"]?.ToString();
         // POST: api/tasks
         [HttpPost]
         public async Task<IActionResult> CreateTask(TaskItem task)
@@ -119,12 +122,13 @@ namespace ProjectManagementAPI.Controllers
             await _redisService.RemoveAsync("tasks:all");
             await _redisService.RemoveAsync($"tasks:project:{task.ProjectId}");
 
+           
 
             // Create a structured message for RabbitMQ
             var message = new ProjectMessage
             {
                 ProjectId = task.ProjectId,
-                Content = $"Task '{task.Title}' is Created!!"
+                Content = $"Task '{task.Title}' is Created by '{UserEmail}'!!"
             };
 
             var jsonMessage = JsonSerializer.Serialize(message);
@@ -170,6 +174,7 @@ namespace ProjectManagementAPI.Controllers
             ////await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
             //await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {updatedTask.Title} is Updated ...... Project id:{updatedTask.ProjectId} ");
 
+            
             // Create a structured message for RabbitMQ
             var message = new ProjectMessage
             {
