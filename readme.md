@@ -24,7 +24,8 @@ Figure 2: Registrtion Page
                                        
 Figure 3: TeamSync Project and task management Dashboard
 
-<img width="937" height="437" alt="image" src="https://github.com/user-attachments/assets/ba734504-facc-4d68-9f82-690732965db8" />
+<img width="891" height="400" alt="image" src="https://github.com/user-attachments/assets/aeca94f2-e358-4f1a-8c8e-dd37b637bc18" />
+
 
                                         
 
