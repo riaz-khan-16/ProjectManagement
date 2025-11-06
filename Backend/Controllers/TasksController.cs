@@ -108,7 +108,7 @@ namespace ProjectManagementAPI.Controllers
         }
 
         // Helper property to get current user
-        private string? UserEmail => HttpContext.Items["UserId"]?.ToString();
+        private string? UserName => HttpContext.Items["UserName"]?.ToString();
         // POST: api/tasks
         [HttpPost]
         public async Task<IActionResult> CreateTask(TaskItem task)
@@ -128,7 +128,7 @@ namespace ProjectManagementAPI.Controllers
             var message = new ProjectMessage
             {
                 ProjectId = task.ProjectId,
-                Content = $"Task '{task.Title}' is Created by '{UserEmail}'!!"
+                Content = $"Task '{task.Title}' is Created by '{UserName}'!!"
             };
 
             var jsonMessage = JsonSerializer.Serialize(message);
@@ -179,7 +179,7 @@ namespace ProjectManagementAPI.Controllers
             var message = new ProjectMessage
             {
                 ProjectId = updatedTask.ProjectId,
-                Content = $"Task '{updatedTask.Title}' is Updated."
+                Content = $"Task '{updatedTask.Title}' is Updated by '{UserName}'."
             };
 
             var jsonMessage = JsonSerializer.Serialize(message);
@@ -213,7 +213,7 @@ namespace ProjectManagementAPI.Controllers
             var message = new ProjectMessage
             {
                 ProjectId = task.ProjectId,
-                Content = $"Task '{task.Title}' was Deleted."
+                Content = $"Task '{task.Title}' was Deleted by '{UserName}'."
             };
 
             var jsonMessage = JsonSerializer.Serialize(message);

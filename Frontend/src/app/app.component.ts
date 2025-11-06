@@ -148,7 +148,7 @@ showToast(message: string) {
   // Automatically remove after 5 seconds
   setTimeout(() => {
     this.removeToast(message);
-  }, 50000);
+  }, 5000);
 }
 
 // Remove a toast manually
