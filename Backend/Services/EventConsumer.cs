@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ProjectManagementAPI.Services
 {   
-    // Defines a contract for consuming events from RabbitMQ queues.
+    
     public interface IEventConsumer
     {
         // Method to start listening to a specific queue asynchronously.
@@ -48,26 +48,18 @@ namespace ProjectManagementAPI.Services
 
             Console.WriteLine($" [*] Waiting for messages on queue: {queueName}");
 
-            // Creates an asynchronous consumer that can handle messages without blocking threads.
+            // Creates an asynchronous consumer that can handle messages
             var consumer = new AsyncEventingBasicConsumer(channel);
 
             // Subscribes to the "ReceivedAsync" event — triggered whenever a message arrives.
             consumer.ReceivedAsync += async (model, ea) =>
             {
-                // Extracts the message body (binary data).
-                var body = ea.Body.ToArray();
-
-                // Converts the byte array to a human-readable UTF-8 string.
-                var message = Encoding.UTF8.GetString(body);
-
-                // Prints the received message to the console.
-                Console.WriteLine($" [x] Received: {message}");
-
-                // Broadcast the received message to all connected SignalR clients
-                await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
-
-                // Returns control back to the event loop (good async practice).
-                await Task.Yield();
+                
+                var body = ea.Body.ToArray(); // Extracts the message body (binary data).
+                var message = Encoding.UTF8.GetString(body); // Converts the byte array to a human-readable UTF-8 string.
+                Console.WriteLine($" [x] Received: {message}");  // Prints the received message to the console.
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification", message); // Broadcast the received message to all connected SignalR clients
+                await Task.Yield();  // Returns control back to the event loop (good async practice).
             };
 
             // Tells RabbitMQ to start delivering messages from the queue to this consumer.
@@ -75,8 +67,8 @@ namespace ProjectManagementAPI.Services
                 queue: queueName,      // The name of the queue to consume from.
                 autoAck: true,         // Automatically acknowledge messages (no manual confirmation).
                 consumer: consumer);   // The consumer object handling messages.
-                                       // Keep the consumer alive indefinitely
-            await Task.Delay(-1, cancellationToken);
+                                       
+            await Task.Delay(-1, cancellationToken); // Keep the consumer alive indefinitely
 
         }
     }

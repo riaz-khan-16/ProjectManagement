@@ -26,22 +26,18 @@ builder.Services.AddSingleton(new ConnectionFactory()
     Password = "guest"
 });
 
-// event publisher and consumer using RabbitMQ
-builder.Services.AddSingleton<IEventPublisher, EventPublisher>();
-builder.Services.AddSingleton<IEventConsumer, EventConsumer>();
-builder.Services.AddHostedService<RabbitMqHostedService>();
-
+builder.Services.AddSingleton<IEventPublisher, EventPublisher>();  // registering event publisher
+builder.Services.AddSingleton<IEventConsumer, EventConsumer>();    // registering event consumer
+builder.Services.AddHostedService<RabbitMqHostedService>();       // registering addhosted service
 
 
 // SignalR
-builder.Services.AddSignalR();
+builder.Services.AddSignalR();         // registering signalr
 
 
 
 
-// ====================
 // Redis Configuration
-// ====================
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var configuration = builder.Configuration.GetValue<string>("Redis:Connection") ?? "localhost:6379";
@@ -87,5 +83,8 @@ app.UseMiddleware<JwtMiddleware>();
 
 app.MapControllers();
 
+// mapping signlR hub
 app.MapHub<NotificationHub>("/hubs/notifications"); // frontend will connect here
+
+
 app.Run();

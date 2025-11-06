@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using ProjectManagementAPI.Models;
 using ProjectManagementAPI.Services;
-using MongoDB.Driver;
+using System.Threading.Tasks;
 
 namespace ProjectManagementAPI.Controllers
 {
@@ -122,7 +123,7 @@ namespace ProjectManagementAPI.Controllers
 
             //// Publish an event to RabbitMQ
             //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
-            await _eventPublisher.PublishEvent("Backend API Development", $" {task.Title} Task added.");
+            await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {task.Title} is created ...... Project id:{task.ProjectId} ");
 
 
             return CreatedAtAction(nameof(GetTask), new { id = task.Id }, task);
@@ -152,6 +153,11 @@ namespace ProjectManagementAPI.Controllers
             await _redisService.RemoveAsync($"task:{id}");
             await _redisService.RemoveAsync($"tasks:project:{updatedTask.ProjectId}");
 
+
+            //// Publish an event to RabbitMQ
+            //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
+            await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {updatedTask.Title} is Updated ...... Project id:{updatedTask.ProjectId} ");
+
             Console.WriteLine(" Task updated and caches cleared.");
 
             return NoContent();
@@ -172,6 +178,13 @@ namespace ProjectManagementAPI.Controllers
             await _redisService.RemoveAsync($"task:{id}");
             await _redisService.RemoveAsync($"tasks:project:{task.ProjectId}");
 
+
+
+
+
+            //// Publish an event to RabbitMQ
+            //await _eventPublisher.PublishEvent(project.Name, $" {task.Title} Task added.");
+            await _eventPublisher.PublishEvent("Backend API Development", $"   Taks {task.Title} is Deleted ...... Project id:{task.ProjectId} ");
 
             Console.WriteLine(" Task deleted and caches cleared.");
             return NoContent();
