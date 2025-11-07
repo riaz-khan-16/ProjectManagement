@@ -1,12 +1,5 @@
 <div class="container my-5">
 
-  <div class="notifications">
-  <h3>Live Notifications:</h3>
-  <ul>
-    <li *ngFor="let msg of messages">{{ msg }}</li>
-  </ul>
-</div>
-
 
 <!-- Toast Container -->
 <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
@@ -24,7 +17,7 @@
 
 
     <!-- Title -->
-    <h1 class="mb-4 text-center">Project and Tasks Management Dashboard</h1>
+    <h1 class="mb-4 text-center">TeamSync</h1>
 
 
     <!-- LOGIN / REGISTER -->
@@ -105,7 +98,8 @@
   <div class="card-body" *ngIf="userProjects.length; else noProjects">
     <ul class="list-group">
       <li *ngFor="let project of userProjects" class="list-group-item">
-        {{ project.name }} -id ({{ project.id }})
+        <!-- {{ project.name }} -id ({{ project.id }}) -->
+          {{ project.name }}
        
       </li>
     </ul>
@@ -131,9 +125,9 @@
             <div class="col-md-3">
               <input type="text" [(ngModel)]="projectForm.description" name="description" class="form-control" placeholder="Description" />
             </div>
-            <div class="col-md-3">
+            <!-- <div class="col-md-3">
               <input type="text" [(ngModel)]="projectForm.membersStr" name="members" class="form-control" placeholder="Members (comma-separated)" />
-            </div>
+            </div> -->
 
             <!--  New dropdown for assigned user -->
             <div class="col-md-3">
@@ -146,7 +140,7 @@
 
                 <button type="button" class="btn btn-primary" (click)="addUserId()">Add Member</button>
             </div>
-
+             
 
             <div class="col-md-3">
               <button type="submit" class="btn btn-primary">{{ editingProject ? 'Update' : 'Add' }}</button>
@@ -166,7 +160,7 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Created By</th>
-                <th>User Ids</th>
+                <th>Team Members</th>
                 <th>Team Chat</th>
                 <th>Tasks</th>
                 <th>Actions</th>
@@ -176,7 +170,7 @@
               <tr *ngFor="let project of projects">
                 <td>{{ project.name }}</td>
                 <td>{{ project.description }}</td>
-                <td></td>
+                <td> {{ project.createdBy }}</td>
                 
                 <!-- <td>{{ project.userIds }}</td> -->
                 <td>

@@ -27,6 +27,11 @@ namespace ProjectManagementAPI.Hubs
         {
             await Clients.Group($"project-{projectId}")
                          .SendAsync("ReceiveProjectMessage", new { senderName, message });
+
+            // Log to the server console for debugging
+            Console.WriteLine($"User {senderName} sent a message to project group-{projectId}: {message}");
+
+
         }
 
 

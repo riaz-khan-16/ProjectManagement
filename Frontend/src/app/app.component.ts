@@ -5,9 +5,6 @@ import { FormsModule } from '@angular/forms';
 import * as signalR from '@microsoft/signalr';
 
 
-
-
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -71,9 +68,6 @@ export class App {
 
 
 
-
-
-
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
@@ -125,8 +119,8 @@ export class App {
 }
 
 
-// ---------------------------------------------------------------
-// Called after projects and tasks are loaded for the logged-in user
+
+// This will make SignalR Group.  Called after projects and tasks are loaded for the logged-in user
 joinSignalRGroups() {
   if (!this.hubConnection || this.hubConnection.state !== signalR.HubConnectionState.Connected) {
     console.warn(' !!!Hub not connected yet, skipping group join.');
@@ -141,9 +135,9 @@ joinSignalRGroups() {
     .catch(err => console.error(' Error joining groups:', err));
 }
 
-// sent project message using SignalR
 
-  //for team chat
+
+  //===============Methods for team chat start ================
   sendProjectMessage(projectId: string) {
   console.log('Sending teamchat msg to the project id: ', projectId);
   
@@ -152,7 +146,6 @@ joinSignalRGroups() {
    
   console.log("the message is: ",message);
 
-
   this.sms.push({
     projectId: projectId,
     senderId: this.currentUserId || 'unknown',
@@ -160,17 +153,34 @@ joinSignalRGroups() {
     message: message
   });
 
-  console.log(this.sms);
+  console.log("See the current sms",this.sms);
+
+ 
 
   // Optionally clear input
   this.newProjectMessage[projectId] = '';
 
-  
+// Send to backend via SignalR if you want
+  this.hubConnection.invoke('SendMessageToProject', projectId, message, this.currentUserName);
+  console.log("message is send to hub");
 
-  // Send to backend via SignalR if you want
-  // this.hubConnection.invoke('SendProjectMessage', projectId, message, this.currentUserName);
+
+
+// recieve via signalR 
+  this.hubConnection.on('ReceiveProjectMessage', (message) => {
+
+    console.log("Recieved msg from hub from",  message["senderName"]);
+    console.log(message["senderName"], " : ", message["message"]);
+
+  this.sms.push({ projectId, senderId: '', senderName:message["senderName"], message:message["message"] });
+
+});
+
+
 }
-//for team chat
+
+
+//get project name by giving it's id
 getProjectNameById(projectId: string): string {
   const project = this.projects.find(p => p.id === projectId);
   return project ? project.name : 'Unknown Project';
@@ -183,6 +193,18 @@ getMessagesForProject(projectId: string) {
   if (!this.sms) return [];
   return this.sms.filter(m => m.projectId === projectId);
 }
+
+//===============Methods for team chat End ================
+
+
+
+
+
+
+
+
+
+
 
  //to see assigned projects of the currrent user
   showCurrentUserProjects() {
@@ -327,6 +349,10 @@ removeToast(message: string) {
     this.projectForm.userIds.push(selectedUserId); // add ID
     this.projectForm.assignedUserId = '';          // reset dropdown
   }
+
+  // Show success toast
+    this.showToast('User added!' );
+   
 }
 
 getUserEmailById(id: string): string {
