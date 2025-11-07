@@ -27,6 +27,9 @@ Figure 3: TeamSync Project and task management Dashboard
 Figure 4: Notification functionality for connected members 
 <img width="882" height="172" alt="image" src="https://github.com/user-attachments/assets/36d67a3a-4951-4134-9014-a115504010f8" />
 
+Figure 5: Team chat functionality
+<img width="865" height="463" alt="image" src="https://github.com/user-attachments/assets/b2cd76fa-167d-4885-90a0-c0694ab4bb8d" />
+
 
 
                                         
