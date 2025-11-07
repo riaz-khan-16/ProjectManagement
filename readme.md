@@ -5,7 +5,8 @@ This project is a real time  collaboration system that allows users to manage pr
 ## Project Demo
 
 
-See the Demo Video: https://youtu.be/Z0SXReOwJ2U
+See the Demo Video: https://youtu.be/Z0SXReOwJ2U  
+See the Team Chat Functionality : https://youtu.be/ZJotXM5wmgE
 
 
 Figure 1: Login Page
@@ -28,7 +29,8 @@ Figure 4: Notification functionality for connected members
 <img width="882" height="172" alt="image" src="https://github.com/user-attachments/assets/36d67a3a-4951-4134-9014-a115504010f8" />
 
 Figure 5: Team chat functionality
-<img width="865" height="463" alt="image" src="https://github.com/user-attachments/assets/b2cd76fa-167d-4885-90a0-c0694ab4bb8d" />
+<img width="924" height="466" alt="image" src="https://github.com/user-attachments/assets/43c41490-2945-48cc-96e9-822a3f3598c4" />
+
 
 
 
@@ -70,6 +72,11 @@ Figure 5: Team chat functionality
 updates to connected clients via SignalR.
     - Behavior: When a task is assigned or updated, all connected members of the project
 receive an instant update.
+- **Team Chat**
+  - SignalR groups: I have used project-specific SignalR groups for chat and updates.  
+  - Persistence: Stored chat messages in MongoDB  
+  - Cache recent messages: Cache last 20 messages per project in Redis for quick retrieval  
+
 - **Frontend**
   - Login & registration linked with backend API
   - JWT stored in `localStorage` for session management
@@ -129,7 +136,7 @@ To make the application faster, **Redis** is used as a caching system. It stores
 
 **RabbitMQ** is used to handle background communication between different parts of the system. When an event happens, such as a new message or a project update, the backend sends that event to a RabbitMQ queue. This message is then received by a consumer service that processes it in the background.
 
-Once RabbitMQ receives an event, it works together with **SignalR** to send real-time updates to users. SignalR allows instant communication between the server and all connected clients. For example, when a team member sends a chat message or creates a task, everyone else in the same project can see the update right away without refreshing the page.
+Once RabbitMQ receives an event, it works together with **SignalR** to send real-time updates about the task  to the connected members for a project. SignalR allows instant communication between the server and all connected clients. When a team member update, create or delete a task, everyone else in the same project can see the update right away without refreshing the page. For team chat,  when new message come to hub it goes to its corresponding project group and broadcasts to all the connected members of that group. 
 
 **Conclusion**: 
 By combining Redis, RabbitMQ, and SignalR, the system becomes faster, more efficient, and real-time.
