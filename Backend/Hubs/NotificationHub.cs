@@ -1,10 +1,22 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver.Core.Servers;
+using ProjectManagementAPI.Models;
+using ProjectManagementAPI.Services;
 
 namespace ProjectManagementAPI.Hubs
 {
     // This hub acts as the communication channel between backend and frontend
     public class NotificationHub : Hub
     {
+
+        private readonly MongoDbService _mongoService;
+
+        public NotificationHub(MongoDbService mongoService)
+        {
+            _mongoService = mongoService;
+        }
+
 
         // Called by frontend immediately after connecting to SignalR
         // The frontend passes a list of project IDs that the current user is assigned to
@@ -25,6 +37,20 @@ namespace ProjectManagementAPI.Hubs
         // Send message to a project group
         public async Task SendMessageToProject(Guid projectId, string message, string senderName)
         {
+
+            // make an object fopr storing in DB
+            var chatMessage = new TeamChatMessage
+            {
+                ProjectId = projectId,
+                SenderName = senderName,
+                Message = message,
+                Timestamp = DateTime.UtcNow
+            };
+
+            await _mongoService.TeamChatMessages.InsertOneAsync(chatMessage);
+
+
+
             await Clients.Group($"project-{projectId}")
                          .SendAsync("ReceiveProjectMessage",  senderName, message, projectId );
 

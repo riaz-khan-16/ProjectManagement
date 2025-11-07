@@ -57,13 +57,12 @@ export class App {
   senderId: string;
   senderName: string;
   message: string;
-}[] = []; // <-- initialize to empty array
+}[] = []; // I will use it  for storing team chat
 
 
-  //for team chat
-  openChatProjectId: string | null = null;
-  newProjectMessage: { [projectId: string]: string } = {};
-// stores new message for each project
+  
+  openChatProjectId: string | null = null;  // get project id 
+  newProjectMessage: { [projectId: string]: string } = {}; // this will stor new message for a project id
 
 
 
@@ -71,7 +70,7 @@ export class App {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-     this.startSignalRConnection(); // connect first
+     this.startSignalRConnection(); // it will connect with signalR
   
     this.token = localStorage.getItem('token');
     if (this.token) {
@@ -88,7 +87,7 @@ export class App {
    
   }
 
-   //  Method to fetch users and log them
+   // This method will fetch users and loig them
 
    async startSignalRConnection() {
   this.hubConnection = new signalR.HubConnectionBuilder()
@@ -100,12 +99,12 @@ export class App {
 
 
 
-  // Listen for backend notifications
+  // It willl lsiten for backend notifications
   this.hubConnection.on('ReceiveNotification', (message: string) => {
     console.log(' New notification:', message);
     this.messages.push(message);
 
-    // Show as toast
+    // Show as toast message
   this.showToast(message);
   });
 
@@ -113,10 +112,8 @@ export class App {
     await this.hubConnection.start();
      
    
-    //team chat
-    this.hubConnection.on('ReceiveProjectMessage', (senderName, message, projectId ) => {
-        // data is the object sent from backend (new { senderName, message })
-       
+    //it will recieve team chat 
+    this.hubConnection.on('ReceiveProjectMessage', (senderName, message, projectId ) => { 
         console.log("received message from Hub")
         console.log(`${senderName}: ${message}`);
         this.sms.push({ projectId, senderId: '', senderName, message });
@@ -133,7 +130,7 @@ export class App {
 
 
 
-// This will make SignalR Group.  Called after projects and tasks are loaded for the logged-in user
+// It will make SignalR Group
 joinSignalRGroups() {
   if (!this.hubConnection || this.hubConnection.state !== signalR.HubConnectionState.Connected) {
     console.warn(' !!!Hub not connected yet, skipping group join.');
@@ -150,7 +147,7 @@ joinSignalRGroups() {
 
 
 
-  //===============Methods for team chat start ================
+  //All Methods  made for team chat 
   sendProjectMessage(projectId: string) {
   console.log('Sending teamchat msg to the project id: ', projectId);
   
@@ -158,14 +155,6 @@ joinSignalRGroups() {
   if (!message) return;
    
   console.log("the message is: ",message);
-
-  // this.sms.push({
-  //   projectId: projectId,
-  //   senderId: this.currentUserId || 'unknown',
-  //   senderName: this.currentUserName || 'Me',
-  //   message: message
-  // });
-
   console.log("See the current sms",this.sms);
 
  
@@ -173,7 +162,7 @@ joinSignalRGroups() {
   // Optionally clear input
   this.newProjectMessage[projectId] = '';
 
-// Send to backend via SignalR if you want
+  // Send to backend via SignalR
   this.hubConnection.invoke('SendMessageToProject', projectId, message, this.currentUserName);
   console.log("message is send to hub");
 
@@ -187,8 +176,7 @@ getProjectNameById(projectId: string): string {
 }
 
 
-//for teamchat
-
+//for teamchat of a project
 getMessagesForProject(projectId: string) {
   
 
@@ -196,7 +184,7 @@ getMessagesForProject(projectId: string) {
   return this.sms.filter(m => m.projectId === projectId);
 }
 
-//===============Methods for team chat End ================
+//methods for team chat End 
 
 
 
@@ -221,17 +209,17 @@ getMessagesForProject(projectId: string) {
 
 }
 
-// Show toast method
+// It is the toast method made for showing notification
 showToast(message: string) {
   this.toastMessages.push(message);
 
-  // Automatically remove after 5 seconds
+  // auto remove after 5 seconds
   setTimeout(() => {
     this.removeToast(message);
   }, 5000);
 }
 
-// Remove a toast manually
+// close the toast 
 removeToast(message: string) {
   const index = this.toastMessages.indexOf(message);
   if (index !== -1) {
@@ -240,7 +228,8 @@ removeToast(message: string) {
 }
 
 
-  loadAllUsers(): void {
+// method os loading all users 
+loadAllUsers(): void {
     this.http.get<any[]>(`${this.apiUrl}/Users`).subscribe({
       next: (data) => {
         this.users = data;
@@ -252,10 +241,13 @@ removeToast(message: string) {
     });
   }
 
-  // --- Auth Methods ---
+  // it will toggle
   toggleAuthMode() { this.showRegister = !this.showRegister; }
 
-  register() {
+
+
+// method for registering
+register() {
     const payload = {
       email: this.authForm.email,
       password: this.authForm.password,
@@ -275,6 +267,7 @@ removeToast(message: string) {
   }
   
 
+// method for login
   login() {
     this.http.post<{ token: string, userId: string, email: string, name: string }>(`${this.apiUrl}/Auth/login`, this.authForm)
       .subscribe({
@@ -290,7 +283,7 @@ removeToast(message: string) {
             this.isLoggedIn = true;
             this.userEmail = this.authForm.email;
 
-             // optional: store in component variables
+             //store in component variables
             this.currentUserId = res.userId;
             this.currentUserName = res.name;
           
@@ -317,7 +310,7 @@ removeToast(message: string) {
  
 
 
-  // --- Projects Methods ---
+  // this is Projects Methods: load all projects ---
   loadProjects() {
     this.http.get<any[]>(`${this.apiUrl}/Projects`, this.getAuthHeaders())
       .subscribe({
@@ -330,7 +323,7 @@ removeToast(message: string) {
                   project.tasks = tasks.filter(task => task.projectId === project.id);
                 });
 
-                // Filter projects for current user
+                // Filter  the projects for the current user who logged in
             this.showCurrentUserProjects();
 
               },
@@ -343,7 +336,7 @@ removeToast(message: string) {
 
  
 
-
+// add new member to a project
   addUserId(): void {
   const selectedUserId = this.projectForm.assignedUserId;
 
@@ -357,18 +350,23 @@ removeToast(message: string) {
    
 }
 
+
+// this method will show user email if i GIVE him id
 getUserEmailById(id: string): string {
   const user = this.users.find(u => u.Id === id);
   return user ? user.Email : 'Unknown';
 }
 
+
+// this method will show name if i give him my id
 getUserNameById(id: string): string {
   const user = this.users.find(u => u.Id === id);
   return user ? user.Name : 'Unknown';
 }
 
 
-  saveProject() {
+// it will save the proejct in 
+saveProject() {
     const payload = {
       name: this.projectForm.name,
       description: this.projectForm.description,
@@ -399,6 +397,7 @@ getUserNameById(id: string): string {
     }
   }
 
+// will update project
   editProject(project: any) {
      this.projectForm = { 
     ...project, membersStr: project.members.join(',') 
@@ -409,7 +408,7 @@ getUserNameById(id: string): string {
   cancelProjectEdit() { this.projectForm = { id: null, name: '', description: '', membersStr: '' }; this.editingProject = false; }
   deleteProject(id: string) { if (!confirm('Delete this project?')) return; this.http.delete(`${this.apiUrl}/Projects/${id}`, this.getAuthHeaders()).subscribe(() => this.loadProjects()); }
 
-  // --- Tasks Methods ---
+  // Tasks Methods: add new task 
   createTask(projectId: string) {
     if (!this.newTaskTitle[projectId]) return;
     const payload = {
@@ -425,8 +424,18 @@ getUserNameById(id: string): string {
       .subscribe(() => { this.loadProjects(); this.newTaskTitle[projectId] = ''; });
   }
 
+  
+
   editTask(task: any, projectId: string) { this.editingTask = { ...task }; this.editingTaskProjectId = projectId; }
+  
+  
+  
+  // update a task
   updateTask() { this.http.put(`${this.apiUrl}/Tasks/${this.editingTask.id}`, this.editingTask, this.getAuthHeaders()).subscribe(() => { this.loadProjects(); this.cancelTaskEdit(); }); }
+  
+  
   cancelTaskEdit() { this.editingTask = null; this.editingTaskProjectId = ''; }
+  
+  // delete the taskkk
   deleteTask(taskId: string) { if (!confirm('Delete this task?')) return; this.http.delete(`${this.apiUrl}/Tasks/${taskId}`, this.getAuthHeaders()).subscribe(() => this.loadProjects()); }
 }
