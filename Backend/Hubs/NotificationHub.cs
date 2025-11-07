@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver.Core.Servers;
 using ProjectManagementAPI.Models;
 using ProjectManagementAPI.Services;
+using System;
 
 namespace ProjectManagementAPI.Hubs
 {
@@ -11,10 +12,12 @@ namespace ProjectManagementAPI.Hubs
     {
 
         private readonly MongoDbService _mongoService;
+        private readonly IRedisService _redisService;
 
-        public NotificationHub(MongoDbService mongoService)
+        public NotificationHub(MongoDbService mongoService, IRedisService redisService)
         {
             _mongoService = mongoService;
+            _redisService = redisService;
         }
 
 
@@ -49,6 +52,17 @@ namespace ProjectManagementAPI.Hubs
 
             await _mongoService.TeamChatMessages.InsertOneAsync(chatMessage);
 
+            // Update Redis cache add last 20
+            string cacheKey = $"teamchat:{projectId}";
+
+            var cached = await _redisService.GetAsync<List<TeamChatMessage>>(cacheKey) ?? new List<TeamChatMessage>();
+            cached.Add(chatMessage);
+
+            if (cached.Count > 20)
+                cached = cached.Skip(cached.Count - 20).ToList(); // keep last 20
+
+            // Reset TTL 
+            await _redisService.SetAsync(cacheKey, cached, TimeSpan.FromMinutes(1));
 
 
             await Clients.Group($"project-{projectId}")
