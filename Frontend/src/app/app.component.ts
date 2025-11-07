@@ -148,6 +148,32 @@ joinSignalRGroups() {
 
 
   //All Methods  made for team chat 
+
+  openTeamChat(projectId: string) {
+  this.openChatProjectId = projectId;
+
+  // fetch history from API
+  this.http.get<any[]>(`${this.apiUrl}/TeamChat/${projectId}`)
+    .subscribe({
+      next: (messages) => {
+        // merge old messages with current SignalR ones
+        this.sms = this.sms.filter(m => m.projectId !== projectId); // remove duplicates
+        messages.forEach(msg => {
+          this.sms.push({
+            projectId: projectId,
+            senderId:'',
+            senderName: msg.senderName,
+            message: msg.message
+          });
+        });
+        console.log('Loaded chat history:', messages);
+      },
+      error: (err) => {
+        console.error('Failed to load chat history:', err);
+      }
+    });
+}
+
   sendProjectMessage(projectId: string) {
   console.log('Sending teamchat msg to the project id: ', projectId);
   
