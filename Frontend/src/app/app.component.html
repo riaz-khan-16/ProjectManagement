@@ -251,16 +251,16 @@
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Team Chat - {{ openChatProjectId }}</h5>
+        <h5 class="modal-title">Team Chat - {{ getProjectNameById(openChatProjectId) }}</h5>
         <button type="button" class="btn-close" (click)="openChatProjectId = null"></button>
       </div>
 
       <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
-        <!-- <div *ngIf="sms && sms.length > 0; else noMessages">
-          <div *ngFor="let msg of sms.filter(m => m.projectId === openChatProjectId)">
-            <strong>{{ msg.senderName }}:</strong> {{ msg.message }}
-          </div>
-        </div> -->
+           <div *ngFor="let msg of getMessagesForProject(openChatProjectId)">
+                 <strong>{{ msg.senderName }}: </strong> {{msg.message}}
+         
+      </div>
+        
         <ng-template #noMessages>
           <em>No messages yet</em>
         </ng-template>

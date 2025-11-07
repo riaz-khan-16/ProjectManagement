@@ -111,6 +111,19 @@ export class App {
 
   try {
     await this.hubConnection.start();
+     
+   
+    //team chat
+    this.hubConnection.on('ReceiveProjectMessage', (senderName, message, projectId ) => {
+        // data is the object sent from backend (new { senderName, message })
+       
+        console.log("received message from Hub")
+        console.log(`${senderName}: ${message}`);
+        this.sms.push({ projectId, senderId: '', senderName, message });
+      });
+
+
+
     console.log(' Connected to SignalR hub');
   } catch (err) {
     console.error(' SignalR connection error:', err);
@@ -146,12 +159,12 @@ joinSignalRGroups() {
    
   console.log("the message is: ",message);
 
-  this.sms.push({
-    projectId: projectId,
-    senderId: this.currentUserId || 'unknown',
-    senderName: this.currentUserName || 'Me',
-    message: message
-  });
+  // this.sms.push({
+  //   projectId: projectId,
+  //   senderId: this.currentUserId || 'unknown',
+  //   senderName: this.currentUserName || 'Me',
+  //   message: message
+  // });
 
   console.log("See the current sms",this.sms);
 
@@ -163,19 +176,6 @@ joinSignalRGroups() {
 // Send to backend via SignalR if you want
   this.hubConnection.invoke('SendMessageToProject', projectId, message, this.currentUserName);
   console.log("message is send to hub");
-
-
-
-// recieve via signalR 
-  this.hubConnection.on('ReceiveProjectMessage', (message) => {
-
-    console.log("Recieved msg from hub from",  message["senderName"]);
-    console.log(message["senderName"], " : ", message["message"]);
-
-  this.sms.push({ projectId, senderId: '', senderName:message["senderName"], message:message["message"] });
-
-});
-
 
 }
 
@@ -190,6 +190,8 @@ getProjectNameById(projectId: string): string {
 //for teamchat
 
 getMessagesForProject(projectId: string) {
+  
+
   if (!this.sms) return [];
   return this.sms.filter(m => m.projectId === projectId);
 }
